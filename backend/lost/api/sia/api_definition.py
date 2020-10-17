@@ -24,7 +24,8 @@ bbox_data = api.model('BBox Data',{
 bbox = api.model('BBox',{
     'id': fields.Integer(readOnly=True, description='The identifier of the bbox.'),
     'labelIds': fields.List(fields.Integer(readOnly=True, description='Label id.'), description='All label ids which belongs to that bbox.'),
-    'data': fields.Nested(bbox_data, description='2-D data of that box.')
+    'data': fields.Nested(bbox_data, description='2-D data of that box.'),
+    'labelValue': fields.String(description='2-D data of that box.')
 })
 
 

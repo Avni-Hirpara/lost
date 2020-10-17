@@ -336,6 +336,7 @@ class SiaUpdate(object):
                 if two_d.anno_time is None:
                     two_d.anno_time = 0.0
                 two_d.anno_time += average_anno_time
+                two_d.anno_value = annotation['labelValue']
                 two_d_json = self.__serialize_two_d_json(two_d)
                 annotation_json['unchanged'].append(two_d_json)
                 self.db_man.save_obj(two_d)
@@ -367,7 +368,8 @@ class SiaUpdate(object):
                                     user_id=self.user_id,
                                     iteration=self.iteration,
                                     dtype=two_d_type,
-                                    state=state.Anno.LABELED)
+                                    state=state.Anno.LABELED,
+                                    anno_value=annotation['labelValue'])
                 self.db_man.save_obj(two_d)
                 for l_id in annotation['labelIds']:
                     label = model.Label(two_d_anno_id=two_d.idx,
@@ -512,6 +514,7 @@ class SiaSerialize(object):
             if two_d_anno.dtype == dtype.TwoDAnno.BBOX:
                 bbox_json = dict()
                 bbox_json['id'] = two_d_anno.idx
+                bbox_json['labelValue'] = two_d_anno.anno_value
                 bbox_json['labelIds'] = list()
                 if two_d_anno.labels: #type: lost.db.model.Label
                     bbox_json['labelIds'] = [lbl.label_leaf_id for lbl in two_d_anno.labels]

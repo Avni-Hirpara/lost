@@ -155,6 +155,7 @@ class TwoDAnno(Base):
     confidence = Column(Float)
     anno_time = Column(Float)
     description = Column(Text)
+    anno_value = Column(String(100))
 
     def __init__(self, anno_task_id=None,
                  user_id=None, timestamp=None, state=None,
@@ -162,7 +163,7 @@ class TwoDAnno(Base):
                  img_anno_id=None, timestamp_lock=None,
                  iteration=0, data=None, dtype=None,
                  confidence=None, anno_time=None,
-                 description=None
+                 description=None, anno_value=None
                  ):
         self.anno_task_id = anno_task_id
         self.user_id = user_id
@@ -178,6 +179,7 @@ class TwoDAnno(Base):
         self.confidence = confidence
         self.anno_time = anno_time
         self.description = description
+        self.anno_value = anno_value
         # if label_leaf_id is not None:
         #     self.label = Label(label_leaf_id=label_leaf_id)
 
@@ -263,7 +265,8 @@ class TwoDAnno(Base):
             'anno.anno_time': self.anno_time,
             'anno.lbl.idx': None,
             'anno.lbl.name': None,
-            'anno.lbl.external_id': None
+            'anno.lbl.external_id': None,
+            'anno.anno_value': self.anno_value
         }
         try:
             anno_dict['anno.dtype'] = dtype.TwoDAnno.TYPE_TO_STR[self.dtype]
@@ -315,7 +318,7 @@ class TwoDAnno(Base):
                 'anno.iteration', 'anno.user_id', 'anno.img_anno_id', 
                 'anno.annotator', 'anno.confidence', 'anno.anno_time', 
                 'anno.lbl.idx', 'anno.lbl.name', 'anno.lbl.external_id', 
-                'anno.data']
+                'anno.data', 'anno.anno_value']
         '''
         return pd.DataFrame(self.to_dict(), index=[0])
 

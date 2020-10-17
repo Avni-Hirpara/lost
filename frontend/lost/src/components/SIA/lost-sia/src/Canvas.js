@@ -24,6 +24,8 @@ import * as wv from './utils/windowViewport'
 
 import './SIA.scss'
 
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 /**
  * SIA Canvas element that handles annotations within an image
@@ -153,6 +155,7 @@ class Canvas extends Component{
         this.hist = new UndoRedo()
         this.keyMapper = new KeyMapper((keyAction) => this.handleKeyAction(keyAction))
         this.mousePosAbs = undefined
+        this.renderEditableCell = this.renderEditableCell.bind(this);
     }
 
     componentDidMount(){
@@ -741,6 +744,7 @@ class Canvas extends Component{
             return {
                 ...el,
                 id: annoId,
+                labelValue: el.labelValue,
                 mode: modes.VIEW,
                 data: transform.toBackend(el.data, this.state.svg, el.type)
             }
@@ -763,7 +767,8 @@ class Canvas extends Component{
             imgLabelIds: this.state.imgLabelIds,
             imgLabelChanged: this.state.imgLabelChanged,
             annotations: backendFormat,
-            isJunk: this.state.isJunk
+            isJunk: this.state.isJunk,
+            labelValue: this.state.labelValue
         }
         return finalData
     }
@@ -855,7 +860,8 @@ class Canvas extends Component{
                 mode: modes.CREATE,
                 status: annoStatus.NEW,
                 labelIds: this.state.prevLabel,
-                selectedNode: 1
+                selectedNode: 1,
+                labelValue: ''
             }
             this.setState({
                 annos: [...this.state.annos, newAnno],
@@ -1001,12 +1007,12 @@ class Canvas extends Component{
             canvasTop = container.top + this.props.layoutOffset.top
             canvasLeft = container.left + this.props.layoutOffset.left
             maxImgHeight = clientHeight - container.top - this.props.layoutOffset.bottom - this.props.layoutOffset.top
-            maxImgWidth = container.right -canvasLeft - this.props.layoutOffset.right
+            maxImgWidth = container.right -canvasLeft - this.props.layoutOffset.right - 240
         } else {
             canvasTop = container.top
             canvasLeft = container.left
             maxImgHeight = clientHeight - container.top
-            maxImgWidth = container.right -canvasLeft
+            maxImgWidth = container.right -canvasLeft - 240
         }
         // if (this.props.appliedFullscreen) maxImgHeight = maxImgHeight + 10 
         var ratio = this.img.current.naturalWidth / this.img.current.naturalHeight
@@ -1127,6 +1133,24 @@ class Canvas extends Component{
         
     }
 
+    renderEditableCell(cellInfo){
+        const anno_data = this.state.annos;
+        return (
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={e => {
+              anno_data[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+              this.setState({ annos: anno_data });
+              }
+            }
+            dangerouslySetInnerHTML={{
+            __html: anno_data[cellInfo.index][cellInfo.column.id]
+            }}
+            />
+        );
+    };
+
     renderImgLabelInput(){
         if (!this.props.annos.image) return null
         return <Prompt 
@@ -1188,6 +1212,42 @@ class Canvas extends Component{
                     // multilabels={true}
         />
     }
+
+    renderFieldTable(){
+        console.log("Available annos", this.state.annos);
+        if (this.state.annos.lenght>0){
+            console.log("anno label", this.props.possibleLabels[this.state.annos[0]["labelIds"][0]])
+        }
+        const columns = [{
+          Header: 'id',
+          accessor: 'id',
+        },{
+          Header: 'labelValue',
+          accessor: 'labelValue',
+          Cell: this.renderEditableCell
+        }]
+        const l_left = this.state.svg.left + this.state.svg.width + 10
+
+        if(this.state.annos && this.state.annos.length > 0) {
+            return (
+                <div
+                  style={{position: 'fixed', top: this.state.svg.top, left: l_left, width: 250}}
+                >
+                  <ReactTable
+                    data={this.state.annos}
+                    columns={columns}
+                    pageSize={this.state.annos.length}
+                    className='-striped -highlight'
+                    showPagination = {false}
+                    NoDataComponent={() => null}
+                    />
+                </div>
+            )
+        }else{
+          return null;
+        }
+    }
+
     render(){
         const selectedAnno = this.findAnno(this.state.selectedAnnoId)
         return(
@@ -1252,6 +1312,8 @@ class Canvas extends Component{
                 {/* </div> */}
                 </div>
                 {/* Placeholder for Layout*/}
+
+                {this.renderFieldTable()}
                 <div style={{minHeight: this.state.svg.height}}></div> 
             </div>)
     }
