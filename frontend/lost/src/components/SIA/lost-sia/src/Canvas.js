@@ -156,6 +156,7 @@ class Canvas extends Component{
         this.keyMapper = new KeyMapper((keyAction) => this.handleKeyAction(keyAction))
         this.mousePosAbs = undefined
         this.renderEditableCell = this.renderEditableCell.bind(this);
+        this.selectLabel = this.selectLabel.bind(this);
     }
 
     componentDidMount(){
@@ -1133,6 +1134,17 @@ class Canvas extends Component{
         
     }
 
+    selectLabel(cellInfo){
+        if(cellInfo.original.mode === 'create'){
+            return 'no label'
+        }
+        else if(cellInfo.original.mode === 'view' || cellInfo.original.mode === 'editLabel'){
+            const label_object = this.state.possibleLabels.filter(label => label.id === cellInfo.original.labelIds[0]);
+            return label_object.length > 0 ? label_object[0].label :  'no label'
+        }
+        return cellInfo.value
+    }
+
     renderEditableCell(cellInfo){
         const anno_data = this.state.annos;
         return (
@@ -1215,14 +1227,12 @@ class Canvas extends Component{
 
     renderFieldTable(){
         console.log("Available annos", this.state.annos);
-        if (this.state.annos.lenght>0){
-            console.log("anno label", this.props.possibleLabels[this.state.annos[0]["labelIds"][0]])
-        }
         const columns = [{
-          Header: 'id',
+          Header: 'Label Name',
           accessor: 'id',
+          Cell: this.selectLabel
         },{
-          Header: 'labelValue',
+          Header: 'Label Value',
           accessor: 'labelValue',
           Cell: this.renderEditableCell
         }]
