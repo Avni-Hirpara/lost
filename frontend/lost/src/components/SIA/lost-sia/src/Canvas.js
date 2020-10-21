@@ -157,6 +157,7 @@ class Canvas extends Component{
         this.mousePosAbs = undefined
         this.renderEditableCell = this.renderEditableCell.bind(this);
         this.selectLabel = this.selectLabel.bind(this);
+        this.onLabelROITableRowClick = this.onLabelROITableRowClick.bind(this);
     }
 
     componentDidMount(){
@@ -1147,17 +1148,21 @@ class Canvas extends Component{
 
     renderEditableCell(cellInfo){
         const anno_data = this.state.annos;
-        return (
+        const sorted_annos = [].concat(this.state.annos).sort((a, b) => a.id > b.id ? 1 : -1);
+
+      return (
           <div
             contentEditable
             suppressContentEditableWarning
             onBlur={e => {
-              anno_data[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
-              this.setState({ annos: anno_data });
+                let labelValue =e.target.innerHTML;
+                sorted_annos[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
+                // const updated_data = anno_data.map(el => (el.id === cellInfo.column.id ? Object.assign({}, el, { labelValue }) : el));
+                this.setState({ annos: sorted_annos });
               }
             }
             dangerouslySetInnerHTML={{
-            __html: anno_data[cellInfo.index][cellInfo.column.id]
+            __html: sorted_annos[cellInfo.index][cellInfo.column.id]
             }}
             />
         );
@@ -1236,6 +1241,7 @@ class Canvas extends Component{
           accessor: 'labelValue',
           Cell: this.renderEditableCell
         }]
+        const sorted_annos = [].concat(this.state.annos).sort((a, b) => a.id > b.id ? 1 : -1);
         const l_left = this.state.svg.left + this.state.svg.width + 10
 
         if(this.state.annos && this.state.annos.length > 0) {
@@ -1244,12 +1250,13 @@ class Canvas extends Component{
                   style={{position: 'fixed', top: this.state.svg.top, left: l_left, width: 250}}
                 >
                   <ReactTable
-                    data={this.state.annos}
+                    data={sorted_annos}
                     columns={columns}
                     pageSize={this.state.annos.length}
                     className='-striped -highlight'
                     showPagination = {false}
                     NoDataComponent={() => null}
+                    getTrProps={this.onLabelROITableRowClick}
                     />
                 </div>
             )
