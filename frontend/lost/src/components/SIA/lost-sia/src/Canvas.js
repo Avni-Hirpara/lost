@@ -26,21 +26,22 @@ import './SIA.scss'
 
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import ROITable from "./ROITable";
 
 /**
  * SIA Canvas element that handles annotations within an image
- * 
+ *
  * @param {React.Ref} container - A react ref to a div that defines the
  *      space where this Canvas lives in.
- * @param {object} annos -  A json object containing all annotation 
+ * @param {object} annos -  A json object containing all annotation
  *      information for an image
  *      {
  *          image : {
- *              id: int, 
- *              url: string, 
- *              number: int, 
- *              amount: int, 
- *              isFirst: bool, 
+ *              id: int,
+ *              url: string,
+ *              number: int,
+ *              amount: int,
+ *              isFirst: bool,
  *              isLast: bool
  *          },
  *          annotations: {
@@ -54,21 +55,21 @@ import "react-table/react-table.css";
  *              polygons: []
  *          }
  *      }
- * @param {object} possibleLabels - Possible labels that can be assigned to 
+ * @param {object} possibleLabels - Possible labels that can be assigned to
  *      an annotation.
- *      {   
- *          id: int, 
- *          description: str, 
- *          label: str, (name of the label) 
+ *      {
+ *          id: int,
+ *          description: str,
+ *          label: str, (name of the label)
  *          color: str (color is optional)
  *      }
  * @param {object} image - The actual image blob that will be displayed
  *      {id: int, data: blob}
- * @param {object} uiConfig - User interface configs 
+ * @param {object} uiConfig - User interface configs
  *      {nodesRadius: int, strokeWidth: int}
  * @param {int} layoutUpdate - A counter that triggers a layout update
  *      everytime it is incremented.
- * @param {string} selectedTool - The tool that is selected to draw an 
+ * @param {string} selectedTool - The tool that is selected to draw an
  *      annotation. Possible choices are: 'bBox', 'point', 'line', 'polygon'
  * @param {object} canvasConfig - Configuration for this canvas
  *  {
@@ -97,7 +98,7 @@ import "react-table/react-table.css";
  * @param {bool} imgLabelInputVisible - Controls visibility of the ImgLabelInputPrompt
  * @param {object} layoutOffset - Offset of the canvas inside the container:
  *      {left:int, top:int, right:int, bottom:int} values in pixels.
- * @param {bool} centerCanvasInContainer - Center the canvas in the 
+ * @param {bool} centerCanvasInContainer - Center the canvas in the
  *      middle of the container.
  * @param {str} defaultLabel (optional) - Name of the default label that is used
  *      when no label was selected for a annotation. If not set "no label" will be used.
@@ -155,9 +156,6 @@ class Canvas extends Component{
         this.hist = new UndoRedo()
         this.keyMapper = new KeyMapper((keyAction) => this.handleKeyAction(keyAction))
         this.mousePosAbs = undefined
-        this.renderEditableCell = this.renderEditableCell.bind(this);
-        this.selectLabel = this.selectLabel.bind(this);
-        this.onLabelROITableRowClick = this.onLabelROITableRowClick.bind(this);
     }
 
     componentDidMount(){
@@ -166,7 +164,7 @@ class Canvas extends Component{
 
     componentDidUpdate(prevProps, prevState){
         // if (this.props.image.id !== prevProps.image.id){
-            
+
         // }
         if (prevProps.annos !== this.props.annos){
             this.setState({
@@ -225,12 +223,12 @@ class Canvas extends Component{
                 this.setState({
                     performedImageInit:true
                 })
-            } 
+            }
             if(prevProps.layoutUpdate !== this.props.layoutUpdate){
                 this.selectAnnotation(undefined)
                 this.updateCanvasView(this.getAnnoBackendFormat())
             }
-            
+
         }
     }
 
@@ -253,7 +251,7 @@ class Canvas extends Component{
     }
 
     onWheel(e){
-        // Zoom implementation. Note that svg is first scaled and 
+        // Zoom implementation. Note that svg is first scaled and
         // second translated!
         const up = e.deltaY < 0
         const mousePos = this.getMousePosition(e)
@@ -1132,45 +1130,12 @@ class Canvas extends Component{
         } else {
             return null
         }
-        
+
     }
-
-    selectLabel(cellInfo){
-        if(cellInfo.original.mode === 'create'){
-            return 'no label'
-        }
-        else if(cellInfo.original.mode === 'view' || cellInfo.original.mode === 'editLabel'){
-            const label_object = this.state.possibleLabels.filter(label => label.id === cellInfo.original.labelIds[0]);
-            return label_object.length > 0 ? label_object[0].label :  'no label'
-        }
-        return cellInfo.value
-    }
-
-    renderEditableCell(cellInfo){
-        const anno_data = this.state.annos;
-        const sorted_annos = [].concat(this.state.annos).sort((a, b) => a.id > b.id ? 1 : -1);
-
-      return (
-          <div
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={e => {
-                let labelValue =e.target.innerHTML;
-                sorted_annos[cellInfo.index][cellInfo.column.id] = e.target.innerHTML;
-                // const updated_data = anno_data.map(el => (el.id === cellInfo.column.id ? Object.assign({}, el, { labelValue }) : el));
-                this.setState({ annos: sorted_annos });
-              }
-            }
-            dangerouslySetInnerHTML={{
-            __html: sorted_annos[cellInfo.index][cellInfo.column.id]
-            }}
-            />
-        );
-    };
 
     renderImgLabelInput(){
         if (!this.props.annos.image) return null
-        return <Prompt 
+        return <Prompt
             onClick={() => this.handleImgLabelInputClose()}
             active={this.props.imgLabelInputVisible}
             header={<div>
@@ -1231,49 +1196,24 @@ class Canvas extends Component{
     }
 
     renderFieldTable(){
-        console.log("Available annos", this.state.annos);
-        const columns = [{
-          Header: 'Label Name',
-          accessor: 'id',
-          Cell: this.selectLabel
-        },{
-          Header: 'Label Value',
-          accessor: 'labelValue',
-          Cell: this.renderEditableCell
-        }]
-        const sorted_annos = [].concat(this.state.annos).sort((a, b) => a.id > b.id ? 1 : -1);
-        const l_left = this.state.svg.left + this.state.svg.width + 10
-
-        if(this.state.annos && this.state.annos.length > 0) {
-            return (
-                <div
-                  style={{position: 'fixed', top: this.state.svg.top, left: l_left, width: 250}}
-                >
-                  <ReactTable
-                    data={sorted_annos}
-                    columns={columns}
-                    pageSize={this.state.annos.length}
-                    className='-striped -highlight'
-                    showPagination = {false}
-                    NoDataComponent={() => null}
-                    getTrProps={this.onLabelROITableRowClick}
-                    />
-                </div>
-            )
-        }else{
-          return null;
-        }
+      return <ROITable
+        annos={this.state.annos}
+        svg ={this.state.svg}
+        possibleLabels ={this.state.possibleLabels}
+        updateSelectedAnno={anno => this.updateSelectedAnno(anno)}
+        selectAnnotation={annoId => this.selectAnnotation(annoId)}
+      />
     }
 
     render(){
         const selectedAnno = this.findAnno(this.state.selectedAnnoId)
         return(
             <div ref={this.container} >
-            <div height={this.state.svg.height} 
+            <div height={this.state.svg.height}
             style={{position: 'fixed', top: this.state.svg.top, left: this.state.svg.left}}
             >
             {this.renderImgLabelInput()}
-            <ImgBar container={this.container} 
+            <ImgBar container={this.container}
                 visible={this.state.imgBarVisible}
                 possibleLabels={this.state.possibleLabels}
                 annos={this.props.annos}
