@@ -164,6 +164,30 @@ class Input(object):
                 df_list.append(img_anno.to_df())
         return pd.concat(df_list)
 
+    def to_list_of_dict(self):
+        '''Get list of dictonary of all annotations related to this object.
+
+        Returns:
+            list of dictonary: Key names are:
+                'img.idx', 'img.anno_task_id', 'img.timestamp', 
+                'img.timestamp_lock', 'img.state', 'img.sim_class', 
+                'img.frame_n', 'img.video_path', 'img.img_path', 
+                'img.result_id', 'img.iteration', 'img.group_id', 
+                'img.anno_time', 'img.lbl.idx', 'img.lbl.name', 
+                'img.lbl.external_id', 'img.annotator', 'anno.idx', 
+                'anno.anno_task_id', 'anno.timestamp', 
+                'anno.timestamp_lock', 'anno.state', 'anno.track_n', 
+                'anno.dtype', 'anno.sim_class', 'anno.iteration', 
+                'anno.group_id', 'anno.img_anno_id', 'anno.annotator', 
+                'anno.confidence', 'anno.anno_time', 'anno.lbl.idx', 
+                'anno.lbl.name', 'anno.lbl.external_id', 'anno.data'
+        '''
+        dict_list = []
+        for result in self._results:
+            for img_anno in result.img_annos:
+                dict_list.append(img_anno.to_dict())
+        return dict_list
+
     @property
     def twod_annos(self):
         '''Iterate over 2D-annotations.
