@@ -46,7 +46,6 @@ class ExportCsv(script.Script):
             img_dict = {}
             img_dict['label_name'] = each['anno.lbl.name']
             img_dict['label_value'] = each['anno.anno_value']
-            img_dict['image_index'] = each['img.idx']
             img_dict['cordinates'] = each['anno.data']
             img_anno_ss.append(img_dict)
         return img_anno_ss
