@@ -31,7 +31,6 @@ class ExportJson(script.Script):
     def get_img_annos(self):
         dict_list = self.inp.to_list_of_dict()
         for img_anno in dict_list:
-            self.logger.info('-------------image path: {}'.format(img_anno[0]['img.img_path']))
             self.logger.info(self.file_man.lostconfig.project_path)
             self.logger.info('----------------')
             img_path = img_anno[0]['img.img_path'].split('.')[0]+'-annotation.json'
@@ -40,13 +39,29 @@ class ExportJson(script.Script):
             with open(ext_path, 'w') as fout:
                 json.dump(img_anno_ss , fout, default=self.default, indent=4)
 
+    def get_four_coordiates(self, anno_data):
+        if not anno_data:
+            return anno_data
+        anno_data = json.loads(anno_data)
+        cords = {}
+        cords['x1'] = anno_data['x']
+        cords['y1'] = anno_data['y']
+        cords['x2'] = anno_data['x']+anno_data['w']
+        cords['y2'] = anno_data['y']
+        cords['x3'] = anno_data['x']
+        cords['y3'] = anno_data['y']+anno_data['h']
+        cords['x4'] = anno_data['x']+anno_data['w']
+        cords['y4'] = anno_data['y']+anno_data['h']
+        return cords
+        
+
     def get_subset_img_anno(self, img_anno):
         img_anno_ss = []
         for each in img_anno:
             img_dict = {}
             img_dict['label_name'] = each['anno.lbl.name']
             img_dict['label_value'] = each['anno.anno_value']
-            img_dict['cordinates'] = each['anno.data']
+            img_dict['cordinates'] = self.get_four_coordiates(each['anno.data'])
             img_anno_ss.append(img_dict)
         return img_anno_ss
             
