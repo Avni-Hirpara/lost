@@ -9,7 +9,7 @@ ARGUMENTS = {'file_name' : { 'value':'annos.csv',
                             'help': 'Name of the file with exported bbox annotations.'}
             }
 
-class ExportCsv(script.Script):
+class ExportJson(script.Script):
     def default(self, o):
         if isinstance(o, (datetime.date, datetime.datetime)):
             return o.isoformat()
@@ -52,4 +52,4 @@ class ExportCsv(script.Script):
             
 
 if __name__ == "__main__":
-    my_script = ExportCsv()
+    my_script = ExportJson()

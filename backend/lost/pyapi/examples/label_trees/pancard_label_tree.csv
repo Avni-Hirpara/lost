@@ -1,0 +1,5 @@
+idx,name,description,external_id,parent_leaf_id,is_root
+0,PAN_ROI,Labels of PAN card ROI,,,TRUE
+1,name,First name in given pan image,,0,
+2,dob,date of birth in given pan image,,0,
+3,pannum,pancard number in given pan image,,0,

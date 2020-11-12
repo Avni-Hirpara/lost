@@ -1,6 +1,6 @@
 {
-  "description": "This pipeline is an example for all available pipeline elements.",
-  "author": "Jonas Jaeger",
+  "description": "This pipeline selects all images of a datasource and requests annotations.",
+  "author": "Avni",
   "pipe-schema-version" : 1.0,
   "elements": [{
       "peN": 0,
@@ -14,16 +14,16 @@
       "peOut": [2],
       "script": {
         "path": "request_annos.py",
-        "description": "Request annotations for all images."
+        "description": "Request annotations for all images in a folder"
       }
     },
     {
       "peN": 2,
-      "peOut": [3,5],
+      "peOut": [3],
       "annoTask": {
-        "name": "Single Image Annoations",
+        "name": "Image Annotation Task",
         "type": "sia",
-        "instructions": "Please draw annotations for all objects in the image",
+        "instructions": "Please draw bounding boxes ,label them and put label value for all ROI in image.",
         "configuration": {
           "tools": {
               "point": true,
@@ -54,41 +54,14 @@
       "peN": 3,
       "peOut": [4],
       "script": {
-        "path": "export_csv.py",
-        "description": "Export annotations to csv file.",
-        "arguments": {
-          "file_name": {
-            "value": "export.csv",
-            "help": "Name of the file to export"
-          }
-        }
+        "path": "export_json.py",
+        "description": "Export all annotations to a csv file. Also create json with annotation for each image."
       }
     },
     {
       "peN": 4,
-      "peOut": [7],
+      "peOut": null,
       "dataExport": {}
-    },
-    {
-      "peN" : 5,
-      "peOut" : [6],
-      "script" : {
-        "path": "vis_image.py",
-        "description" : "Visualize a cat image and add a caption."
-      }
-    },
-    {
-      "peN" : 6,
-      "peOut" : [7],
-      "visualOutput" : {}
-    },
-    {
-      "peN" : 7,
-      "peOut" : null,
-      "loop" : {
-        "maxIteration" : 3,
-        "peJumpId" : 0
-      }
     }
   ]
 }
