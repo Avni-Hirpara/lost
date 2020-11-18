@@ -400,6 +400,7 @@ class SiaUpdate(object):
                     two_d.anno_time = 0.0
                 two_d.anno_time += average_anno_time
                 two_d.state = state.Anno.LABELED
+                two_d.anno_value = annotation['labelValue']
 
                 l_id_list = list()
                 # get all labels of that two_d_anno.
