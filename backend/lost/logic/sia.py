@@ -329,17 +329,21 @@ class SiaUpdate(object):
         for annotation in annotations: 
             if annotation['status'] == "database":
                 two_d = self.db_man.get_two_d_anno(annotation['id']) #type: lost.db.model.TwoDAnno
-                two_d.user_id = self.user_id
-                two_d.state = state.Anno.LABELED
-                two_d.timestamp = self.timestamp
-                two_d.timestamp_lock = self.image_anno.timestamp_lock
-                if two_d.anno_time is None:
-                    two_d.anno_time = 0.0
-                two_d.anno_time += average_anno_time
-                two_d.anno_value = annotation['labelValue']
-                two_d_json = self.__serialize_two_d_json(two_d)
-                annotation_json['unchanged'].append(two_d_json)
-                self.db_man.save_obj(two_d)
+                available_labels = self.db_man.get_all_two_d_label(two_d.idx)
+                if len(available_labels) == 0:
+                    self.db_man.delete(two_d)
+                else:
+                    two_d.user_id = self.user_id
+                    two_d.state = state.Anno.LABELED
+                    two_d.timestamp = self.timestamp
+                    two_d.timestamp_lock = self.image_anno.timestamp_lock
+                    if two_d.anno_time is None:
+                        two_d.anno_time = 0.0
+                    two_d.anno_time += average_anno_time
+                    two_d.anno_value = annotation['labelValue']
+                    two_d_json = self.__serialize_two_d_json(two_d)
+                    annotation_json['unchanged'].append(two_d_json)
+                    self.db_man.save_obj(two_d)
             elif annotation['status'] == "deleted":
                 try:
                     two_d = self.db_man.get_two_d_anno(annotation['id']) #type: lost.db.model.TwoDAnno
@@ -392,47 +396,51 @@ class SiaUpdate(object):
                 except:
                     pass
                 two_d = self.db_man.get_two_d_anno(annotation['id']) #type: lost.db.model.TwoDAnno
-                two_d.timestamp = self.timestamp
-                two_d.timestamp_lock = self.image_anno.timestamp_lock
-                two_d.data = json.dumps(annotation_data)
-                two_d.user_id = self.user_id
-                if two_d.anno_time is None:
-                    two_d.anno_time = 0.0
-                two_d.anno_time += average_anno_time
-                two_d.state = state.Anno.LABELED
-                two_d.anno_value = annotation['labelValue']
+                available_labels = self.db_man.get_all_two_d_label(two_d.idx)
+                if len(available_labels) == 0 and len(annotation['labelIds']) == 0:
+                    self.db_man.delete(two_d)
+                else:
+                    two_d.timestamp = self.timestamp
+                    two_d.timestamp_lock = self.image_anno.timestamp_lock
+                    two_d.data = json.dumps(annotation_data)
+                    two_d.user_id = self.user_id
+                    if two_d.anno_time is None:
+                        two_d.anno_time = 0.0
+                    two_d.anno_time += average_anno_time
+                    two_d.state = state.Anno.LABELED
+                    two_d.anno_value = annotation['labelValue']
 
-                l_id_list = list()
-                # get all labels of that two_d_anno.
-                for label in self.db_man.get_all_two_d_label(two_d.idx):
-                    # save id.
-                    l_id_list.append(label.idx)
-                    # delete labels, that are not in user labels list.
-                    if label.idx not in annotation['labelIds']:
-                        self.db_man.delete(label)
-                    # labels that are in the list get a new anno_time
-                    else:   
-                        if label.anno_time is None:
-                            label.anno_time = 0.0
-                        label.anno_time += average_anno_time
-                        label.timestamp = self.timestamp
-                        label.annotator_id=self.user_id,
-                        label.timestamp_lock = self.image_anno.timestamp_lock
-                        self.db_man.save_obj(label)
-                # new labels 
-                for l_id in annotation['labelIds']:
-                    if l_id not in l_id_list:
-                        label = model.Label(two_d_anno_id=two_d.idx,
-                                        label_leaf_id=l_id,
-                                        dtype=dtype.Label.TWO_D_ANNO,
-                                        timestamp=self.timestamp,
-                                        annotator_id=self.user_id,
-                                        timestamp_lock=self.image_anno.timestamp_lock,
-                                        anno_time=average_anno_time)
-                        self.db_man.save_obj(label) 
-                self.db_man.save_obj(two_d)
-                two_d_json = self.__serialize_two_d_json(two_d)
-                annotation_json['changed'].append(two_d_json)
+                    l_id_list = list()
+                    # get all labels of that two_d_anno.
+                    for label in available_labels:
+                        # save id.
+                        l_id_list.append(label.idx)
+                        # delete labels, that are not in user labels list.
+                        if label.idx not in annotation['labelIds']:
+                            self.db_man.delete(label)
+                        # labels that are in the list get a new anno_time
+                        else:   
+                            if label.anno_time is None:
+                                label.anno_time = 0.0
+                            label.anno_time += average_anno_time
+                            label.timestamp = self.timestamp
+                            label.annotator_id=self.user_id,
+                            label.timestamp_lock = self.image_anno.timestamp_lock
+                            self.db_man.save_obj(label)
+                    # new labels 
+                    for l_id in annotation['labelIds']:
+                        if l_id not in l_id_list:
+                            label = model.Label(two_d_anno_id=two_d.idx,
+                                            label_leaf_id=l_id,
+                                            dtype=dtype.Label.TWO_D_ANNO,
+                                            timestamp=self.timestamp,
+                                            annotator_id=self.user_id,
+                                            timestamp_lock=self.image_anno.timestamp_lock,
+                                            anno_time=average_anno_time)
+                            self.db_man.save_obj(label) 
+                    self.db_man.save_obj(two_d)
+                    two_d_json = self.__serialize_two_d_json(two_d)
+                    annotation_json['changed'].append(two_d_json)
             else:
                 continue
         self.history_json['annotations'] = annotation_json
