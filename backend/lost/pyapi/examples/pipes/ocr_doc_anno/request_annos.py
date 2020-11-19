@@ -2,7 +2,6 @@ from lost.pyapi import script
 import os
 import random
 import json
-from urllib.parse import urlencode, quote
 from urllib.request import Request, urlopen
 
 
