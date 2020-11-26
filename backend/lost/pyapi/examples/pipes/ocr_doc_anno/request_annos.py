@@ -1,7 +1,12 @@
 from lost.pyapi import script
 import os
 import random
+import json
+from urllib.parse import urlencode, quote
+from urllib.request import Request, urlopen
 
+
+ctpn_request_url = os.environ['CTPN_request']
 ENVS = ['lost']
 ARGUMENTS = {'polygon' : { 'value':'false',
                             'help': 'Add a dummy polygon proposal as example.'},
@@ -51,8 +56,31 @@ class RequestAnnos(script.Script):
                 for file in filenames:
                     if any(file.endswith(filter) for filter in imgfile_filter):
                         img_path = os.path.join(media_path, dirpath, file)
-                        self.outp.request_annos(img_path=img_path, annos=annos, anno_types=anno_types, anno_labels=lbls)
+                        try:
+                            annos_data = self.read_annos_from_ctpn(img_path)
+                            self.outp.request_bbox_annos(img_path=img_path, boxes=annos_data, labels=lbls)
+                        except:
+                            self.outp.request_annos(img_path=img_path, annos=annos, anno_types=anno_types, anno_labels=lbls)
                         self.logger.info('Requested annos for: {}'.format(img_path))
+
+    def read_annos_from_ctpn(self, img_path):
+        with open (img_path,'r') as img:
+            image = base64.b64encode(img.read())
+        ctpn_req_data = {'image':image.decode('utf-8')}
+        
+        headers = {"X-Request-ID":"1a8a3ca3-8a45-4cae-b165-43c962241e1a", "Content-Type":"application/json"}
+        req = Request(ctpn_request_url, data=json.dumps(ctpn_req_data).encode("utf-8"), headers=headers)
+        response = urlopen(req).read()
+        res_data =json.loads(response.decode())
+        
+        roi_cor = res_data['roiCordinates']
+        annos = []
+        for each_roi in roi_cor:
+            mid_x = each_roi['x']+each_roi['w']/2
+            mid_y = each_roi['y']+each_roi['h']/2
+            annos.append([mid_x, mid_y, each_roi['w'], each_roi['h']])
+        self.logger.info('---- Annos in the file--: {}'.format(annos))
+        return annos
 
 if __name__ == "__main__":
     my_script = RequestAnnos() 

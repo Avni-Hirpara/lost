@@ -44,14 +44,15 @@ class ExportJson(script.Script):
             return anno_data
         anno_data = json.loads(anno_data)
         cords = {}
-        cords['x1'] = anno_data['x']
-        cords['y1'] = anno_data['y']
-        cords['x2'] = anno_data['x']+anno_data['w']
-        cords['y2'] = anno_data['y']
-        cords['x3'] = anno_data['x']
-        cords['y3'] = anno_data['y']+anno_data['h']
-        cords['x4'] = anno_data['x']+anno_data['w']
-        cords['y4'] = anno_data['y']+anno_data['h']
+        # x and y are center coordinates for bbox
+        cords['x1'] = anno_data['x'] - anno_data['w']/2
+        cords['y1'] = anno_data['y'] - anno_data['h']/2
+        cords['x2'] = anno_data['x'] + anno_data['w']/2
+        cords['y2'] = anno_data['y'] - anno_data['h']/2
+        cords['x3'] = anno_data['x'] - anno_data['w']/2
+        cords['y3'] = anno_data['y'] + anno_data['h']/2
+        cords['x4'] = anno_data['x'] + anno_data['w']/2
+        cords['y4'] = anno_data['y'] + anno_data['h']/2
         return cords
         
 
