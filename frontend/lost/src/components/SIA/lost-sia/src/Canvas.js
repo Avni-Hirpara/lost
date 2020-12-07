@@ -24,9 +24,9 @@ import * as wv from './utils/windowViewport'
 
 import './SIA.scss'
 
-import ReactTable from "react-table";
 import "react-table/react-table.css";
 import ROITable from "./ROITable";
+import TagDropDown from './tagDropDown';
 
 /**
  * SIA Canvas element that handles annotations within an image
@@ -134,7 +134,6 @@ class Canvas extends Component{
             },
             annos: [],
             mode: modes.VIEW,
-            // selectedAnnoId: {id:undefined},
             selectedAnnoId: undefined,
             showSingleAnno: undefined,
             showLabelInput: false,
@@ -163,17 +162,13 @@ class Canvas extends Component{
     }
 
     componentDidUpdate(prevProps, prevState){
-        // if (this.props.image.id !== prevProps.image.id){
-
-        // }
+    
         if (prevProps.annos !== this.props.annos){
             this.setState({
-                imgLabelIds: this.props.annos.image.labelIds,
-                // isJunk: this.props.annos.image.isJunk
+                imgLabelIds: this.props.annos.image.labelIds
             })
             this.setState({
                 imageLoaded: false,
-                // imageData: undefined
             })
         }
         if (prevProps.isJunk !== this.props.isJunk){
@@ -186,16 +181,7 @@ class Canvas extends Component{
         if (this.state.imageData !== this.props.image.data){
             this.setState({imageData: this.props.image.data})
         }
-        // if (!this.state.imageLoaded){
-        //     if(this.props.annos.image.id === this.props.image.id){
-        //         this.setState({
-        //             imageLoaded: true
-        //         })
-        //         if (this.props.onImageLoaded){
-        //             this.props.onImageLoaded()
-        //         }
-        //     }
-        // }
+
         if (this.props.possibleLabels !== prevProps.possibleLabels){
             this.updatePossibleLabels()
         }
@@ -346,7 +332,6 @@ class Canvas extends Component{
                     this.updateSelectedAnno(
                         anno, modes.ADD
                     )
-                    // this.showSingleAnno(anno.id)
                 }
                 break
             case keyActions.LEAVE_ANNO_ADD_MODE:
@@ -354,7 +339,6 @@ class Canvas extends Component{
                     this.updateSelectedAnno(
                         anno, modes.VIEW
                     )
-                    // this.showSingleAnno(undefined)
                 }
                 break
             case keyActions.UNDO:
@@ -768,7 +752,8 @@ class Canvas extends Component{
             imgLabelChanged: this.state.imgLabelChanged,
             annotations: backendFormat,
             isJunk: this.state.isJunk,
-            labelValue: this.state.labelValue
+            labelValue: this.state.labelValue,
+            imgTag: this.props.image.imgTag
         }
         return finalData
     }
@@ -1005,7 +990,7 @@ class Canvas extends Component{
         var maxImgWidth 
         if(this.props.layoutOffset){
             canvasTop = container.top + this.props.layoutOffset.top
-            canvasLeft = container.left + this.props.layoutOffset.left
+            canvasLeft = container.left + this.props.layoutOffset.left + 200
             maxImgHeight = clientHeight - container.top - this.props.layoutOffset.bottom - this.props.layoutOffset.top
             maxImgWidth = container.right -canvasLeft - this.props.layoutOffset.right - 240
         } else {
@@ -1205,10 +1190,25 @@ class Canvas extends Component{
       />
     }
 
+    setTag(tag){
+        if (tag.target.innerText !== this.props.image.imgTag){
+            this.setState({
+                imgTag: tag.target.innerText
+            })
+            this.props.image.imgTag = tag.target.innerText
+        }
+    }
+    renderTagTable(){
+        return <TagDropDown
+            imageTag = {this.props.image.imgTag}
+            selectTag={tag=>this.setTag(tag)}
+        />
+    }
     render(){
         const selectedAnno = this.findAnno(this.state.selectedAnnoId)
         return(
             <div ref={this.container} >
+            {this.renderTagTable()}
             <div height={this.state.svg.height}
             style={{position: 'fixed', top: this.state.svg.top, left: this.state.svg.left}}
             >

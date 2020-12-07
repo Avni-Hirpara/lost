@@ -247,6 +247,7 @@ class SiaUpdate(object):
         self.history_json['annotations']['deleted'] = list()
         self._update_img_labels(data)  
         self.image_anno.is_junk = data['isJunk']   
+        self.image_anno.img_tag = data['imgTag']
 
         # store certain annotations    
         if 'bBoxes' in data['annotations']:
@@ -510,6 +511,8 @@ class SiaSerialize(object):
         self.sia_json['image']['number'] = self.current_image_number
         self.sia_json['image']['amount'] = self.total_image_amount
         self.sia_json['image']['isJunk'] = self.image_anno.is_junk
+        self.sia_json['image']['imgTag'] = self.image_anno.img_tag
+        
         if self.image_anno.labels is None:
             self.sia_json['image']['labelIds'] = []
         else:

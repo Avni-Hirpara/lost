@@ -12,6 +12,7 @@ image = api.model('Image', {
     'isLast': fields.Boolean(readOnly=True, description='Weather the image is the last one of the annotation process.'),
     'labelIds': fields.List(fields.Integer(readOnly=True, description='Label id.'), description='All label ids which belongs to this image.'),
     'isJunk': fields.Boolean(readOnly=True, description='Indicates if the image was marked as Junk.'),
+    'imgTag': fields.String(description='image quality tag.')
 })
 
 bbox_data = api.model('BBox Data',{

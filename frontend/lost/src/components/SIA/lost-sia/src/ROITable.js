@@ -59,7 +59,7 @@ class ROITable extends Component{
           __html: sorted_annos[cellInfo.index][cellInfo.column.id]
         }}
         onBlur={e => {
-          let labelValue =e.target.innerHTML;
+          let labelValue = e.target.innerHTML;
           let filtered = this.state.annos.filter( (el) => {
             return el.id === cellInfo.original.id
           })[0]

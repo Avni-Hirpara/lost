@@ -621,6 +621,7 @@ class ImageAnno(Base):
     anno_time = Column(Float)
     is_junk = Column(Boolean)
     description = Column(Text)
+    img_tag = Column(String(20))
 
     def __init__(self, anno_task_id=None, user_id=None,
                  timestamp=None, state=None,
@@ -628,7 +629,7 @@ class ImageAnno(Base):
                  frame_n=None,
                  video_path=None,
                  iteration=0, anno_time=None, is_junk=None,
-                 description=None):
+                 description=None,img_tag=None):
         self.anno_task_id = anno_task_id
         self.user_id = user_id
         self.timestamp = timestamp
@@ -642,6 +643,7 @@ class ImageAnno(Base):
         self.anno_time = anno_time
         self.is_junk = is_junk
         self.description = description
+        self.img_tag=img_tag
         # if label_leaf_id is not None:
         #     self.label = Label(label_leaf_id=label_leaf_id)
 
@@ -739,7 +741,8 @@ class ImageAnno(Base):
             'img.lbl.name': None,
             'img.lbl.external_id': None,
             'img.annotator': None,
-            'img.is_junk': self.is_junk
+            'img.is_junk': self.is_junk,
+            'img.tag':self.img_tag
         }
         try:
             img_dict['img.lbl.idx'] = [

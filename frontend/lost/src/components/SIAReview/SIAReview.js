@@ -40,7 +40,7 @@ class SIAReview extends Component {
             tool: 'bBox',
             imgLabelInputVisible: false,
             isJunk: false,
-            image:{id:null, data:null},
+            image:{id:null, data:null, imgTag:null},
             iteration: null
         }
         this.siteHistory = createHashHistory()
@@ -115,6 +115,7 @@ class SIAReview extends Component {
                 this.setState({image: {
                     // ...this.state.image, 
                     id: this.props.annos.image.id, 
+                    imgTag: this.props.annos.image.imgTag,
                     data:window.URL.createObjectURL(response)
                 }})
                 if (this.canvas.current){
