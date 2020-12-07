@@ -49,25 +49,7 @@ class ImgBar extends Component{
         }
     }
 
-    // renderImgLabelInput(){
-    //     if (this.props.allowedActions.label){
-    //         return <Menu.Item style={{padding: "5px"}}>
-    //             <LabelInput
-    //                 // multilabels={true}
-    //                 multilabels={this.props.multilabels}
-    //                 relatedId={this.props.annos.image.id}
-    //                 visible={this.props.visible}
-    //                 onLabelUpdate={label => this.handleLabelUpdate(label)}
-    //                 possibleLabels={this.props.possibleLabels}
-    //                 initLabelIds={this.props.imgLabelIds}
-    //                 relatedId={this.props.annos.image.id}
-    //                 disabled={!this.props.allowedActions.label}
-    //                 />
-    //         </Menu.Item>
-    //     } else {
-    //         return null
-    //     }
-    // }
+
 
     renderImgLabels(){
         let label = ''

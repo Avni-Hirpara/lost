@@ -57,13 +57,16 @@ class ExportJson(script.Script):
         
 
     def get_subset_img_anno(self, img_anno):
-        img_anno_ss = []
+        img_anno_ss = {}
+        img_anno_ss['image_quality'] = img_anno[0]['img.tag']
+        annos = []
         for each in img_anno:
             img_dict = {}
             img_dict['label_name'] = each['anno.lbl.name']
             img_dict['label_value'] = each['anno.anno_value']
             img_dict['cordinates'] = self.get_four_coordiates(each['anno.data'])
-            img_anno_ss.append(img_dict)
+            annos.append(img_dict)
+        img_anno_ss['annotations'] = annos
         return img_anno_ss
             
 
