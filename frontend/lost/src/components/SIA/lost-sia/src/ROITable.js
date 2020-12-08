@@ -42,6 +42,9 @@ class ROITable extends Component{
       return 'no label'
     }
     else if(cellInfo.original.mode === 'view' || cellInfo.original.mode === 'editLabel'){
+      if (this.props.possibleLabels == undefined){
+        return 'no label'
+      }
       const label_object = this.props.possibleLabels.filter(label => label.id === cellInfo.original.labelIds[0]);
       return label_object.length > 0 ? label_object[0].label :  'no label'
     }
