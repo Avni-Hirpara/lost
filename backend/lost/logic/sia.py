@@ -122,6 +122,17 @@ def get_label_trees(db_man, user_id, at=None):
         label_trees = dict()
         label_trees['labels'] = list()
         return label_trees
+
+def get_available_tags(db_man):
+    available_tags = dict()
+    available_tags['tags'] = list()
+    for tag in db_man.get_available_tags():
+        tag_json = dict()
+        tag_json['id'] = tag.idx
+        tag_json['tag'] = tag.name
+        tag_json['description'] = tag.description
+        available_tags['tags'].append(tag_json)
+    return available_tags
         
 def get_configuration(db_man, user_id):
     at = get_sia_anno_task(db_man,user_id)
@@ -245,8 +256,9 @@ class SiaUpdate(object):
         self.history_json['annotations']['unchanged'] = list()
         self.history_json['annotations']['changed'] = list()
         self.history_json['annotations']['deleted'] = list()
-        self._update_img_labels(data)  
-        self.image_anno.is_junk = data['isJunk']   
+        self._update_img_labels(data)
+        
+        self.image_anno.is_junk = data['isJunk']
         self.image_anno.img_tag = data['imgTag']
 
         # store certain annotations    
