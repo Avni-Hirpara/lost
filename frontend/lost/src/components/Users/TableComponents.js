@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Icon, Button, Input, Label, Form, Dropdown } from 'semantic-ui-react'
+import { Icon, Button, Input, Label, Form } from 'semantic-ui-react'
 import * as Alert from '../BasicComponents/Alert'
 import actions from 'actions/group'
 import { useDispatch, useSelector } from 'react-redux';

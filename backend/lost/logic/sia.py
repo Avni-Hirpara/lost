@@ -257,9 +257,10 @@ class SiaUpdate(object):
         self.history_json['annotations']['changed'] = list()
         self.history_json['annotations']['deleted'] = list()
         self._update_img_labels(data)
+        self._update_img_tags(data)
         
         self.image_anno.is_junk = data['isJunk']
-        self.image_anno.img_tag = data['imgTag']
+        self.img_tags = data['imgTags']
 
         # store certain annotations    
         if 'bBoxes' in data['annotations']:
@@ -295,9 +296,25 @@ class SiaUpdate(object):
             for ll_id in to_add:
                 self.image_anno.labels.append(model.Label(label_leaf_id=ll_id))
 
+    def _update_img_tags(self, data):
+        if(data['imgTagChanged']):
+            old = set([tag.tag_id for tag in self.image_anno.tags])
+            new = set(data['imgTags'])
+            to_delete = old - new
+            to_add = new - old
+            print('HERE***')
+            print('old, new', old, new) 
+            print('to_delete, to_add', to_delete, to_add)
+            for tag in self.image_anno.tags:
+                if tag.tag_id in to_delete:
+                    self.image_anno.tags.remove(tag)
+            for tag_id in to_add:
+                self.image_anno.tags.append(model.image_tag(tag_id=tag_id))
+
     def update(self):
         if self.at.pipe_element.pipe.state == state.Pipe.PAUSED:
             return "pipe is paused"
+        self.__update_image_tags()
         if self.b_boxes is not None:
             self.__update_annotations(self.b_boxes, dtype.TwoDAnno.BBOX)
         if self.points is not None:
@@ -459,6 +476,21 @@ class SiaUpdate(object):
         self.history_json['annotations'] = annotation_json
         return "success"
 
+    def __update_image_tags(self):
+        available_tags = self.db_man.get_all_img_tag(self.image_anno.idx)
+        tag_id_list = list()
+        for tag in available_tags:
+            tag_id_list.append(tag.idx)
+            if tag.idx not in self.img_tags:
+                self.db_man.delete(tag)
+
+        for tag in self.img_tags:
+            if tag not in tag_id_list:
+                img_tag = model.ImageTag(img_anno_id=self.image_anno.idx, tag_id=tag)
+                self.db_man.save_obj(img_tag)
+
+
+
     def __serialize_two_d_json(self, two_d):
         two_d_json = dict()
         two_d_json['id'] = two_d.idx
@@ -523,12 +555,15 @@ class SiaSerialize(object):
         self.sia_json['image']['number'] = self.current_image_number
         self.sia_json['image']['amount'] = self.total_image_amount
         self.sia_json['image']['isJunk'] = self.image_anno.is_junk
-        self.sia_json['image']['imgTag'] = self.image_anno.img_tag
-        
+        # self.sia_json['image']['imgTags'] = self.image_anno.img_tags
         if self.image_anno.labels is None:
             self.sia_json['image']['labelIds'] = []
         else:
             self.sia_json['image']['labelIds'] = [lbl.label_leaf_id for lbl in self.image_anno.labels]
+        if self.image_anno.tags is None:
+            self.sia_json['image']['tags'] = []
+        else:
+            self.sia_json['image']['tags'] = [tag.tag_id for tag in self.image_anno.tags]
         self.sia_json['annotations'] = dict()
         self.sia_json['annotations']['bBoxes'] = list()
         self.sia_json['annotations']['points'] = list()

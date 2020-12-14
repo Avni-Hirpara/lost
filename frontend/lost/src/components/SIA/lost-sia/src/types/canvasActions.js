@@ -14,3 +14,5 @@ export const ANNO_START_CREATING='annoStartCreating'
 
 //Image actions
 export const IMG_LABEL_UPDATE='imgLabelUpdate'
+export const IMG_TAG_UPDATE='imgTagUpdate'
+

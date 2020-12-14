@@ -148,7 +148,8 @@ class Canvas extends Component{
             imgBarVisible:false,
             annoToolBarVisible: false,
             possibleLabels: undefined,
-            imgTags: []
+            imgTags: [],
+            imgTagChanged: false
         }
         this.img = React.createRef()
         this.svg = React.createRef()
@@ -781,7 +782,8 @@ class Canvas extends Component{
             annotations: backendFormat,
             isJunk: this.state.isJunk,
             labelValue: this.state.labelValue,
-            imgTag: this.state.imgTag
+            imgTags: this.state.imgTags,
+            imgTagChanged: this.state.imgTagChanged
         }
         return finalData
     }
@@ -1226,18 +1228,18 @@ class Canvas extends Component{
       />
     }
 
-    setTag(tag){
-        if (tag.target.innerText !== this.props.image.imgTag){
-            this.setState({
-                imgTag: tag.target.innerText
-            })
-            this.props.image.imgTag = tag.target.innerText
+    setTag(e, item){
+        console.log(item.value)
+        if (item.value !== this.props.image.imgTags){
+            this.props.image.imgTags = item.value
+            this.handleImgTagUpdate(item.value)
         }
     }
     renderTagTable(){
         return <TagDropDown
-            imageTag = {this.props.image.imgTag}
-            selectTag={tag=>this.setTag(tag)}
+            imageTags = {this.props.image.imgTags}
+            selectTag={(e, item)=>this.setTag(e, item)}
+            // onTagUpdate={tag => this.handleImgTagUpdate(tag)}
         />
     }
     render(){

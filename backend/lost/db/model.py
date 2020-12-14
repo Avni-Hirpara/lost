@@ -621,7 +621,7 @@ class ImageAnno(Base):
     anno_time = Column(Float)
     is_junk = Column(Boolean)
     description = Column(Text)
-    img_tag = Column(String(20))
+    tags = relationship('ImageTag')
 
     def __init__(self, anno_task_id=None, user_id=None,
                  timestamp=None, state=None,
@@ -629,7 +629,7 @@ class ImageAnno(Base):
                  frame_n=None,
                  video_path=None,
                  iteration=0, anno_time=None, is_junk=None,
-                 description=None,img_tag=None):
+                 description=None):
         self.anno_task_id = anno_task_id
         self.user_id = user_id
         self.timestamp = timestamp
@@ -643,7 +643,7 @@ class ImageAnno(Base):
         self.anno_time = anno_time
         self.is_junk = is_junk
         self.description = description
-        self.img_tag=img_tag
+        # self.img_tag=img_tag
         # if label_leaf_id is not None:
         #     self.label = Label(label_leaf_id=label_leaf_id)
 
@@ -742,7 +742,7 @@ class ImageAnno(Base):
             'img.lbl.external_id': None,
             'img.annotator': None,
             'img.is_junk': self.is_junk,
-            'img.tag':self.img_tag
+            # 'img.tag':self.img_tag
         }
         try:
             img_dict['img.lbl.idx'] = [
@@ -751,6 +751,8 @@ class ImageAnno(Base):
                 lbl.label_leaf.name for lbl in self.labels]
             img_dict['img.lbl.external_id'] = [
                 lbl.label_leaf.external_id for lbl in self.labels]
+            img_dict['img.tag.name'] = [tag.name for tag in self.tags]
+            img_dict['img.tag.idx'] = [tag.idx for tag in self.tags]
         except:
             pass
         try:
@@ -770,6 +772,8 @@ class ImageAnno(Base):
             img_dict['img.lbl.name'] = json.dumps(img_dict['img.lbl.name'])
             img_dict['img.lbl.external_id'] = json.dumps(
                 img_dict['img.lbl.external_id'])
+            img_dict['img.tag.name'] = json.dumps(img_dict['img.tag.name'])
+            img_dict['img.tag.idx'] = json.dumps(img_dict['img.tag.idx'])
             d_list = []
             if len(self.twod_annos) > 0:
                 for anno in self.twod_annos:
@@ -1634,3 +1638,25 @@ class TagDirectory(Base):
             pd.DataFrame:
         '''
         return pd.DataFrame(self.to_dict(), index=[0])
+
+class ImageTag(Base):
+    '''A ImageTag
+
+    Attributes:
+        idx (int): ID in database.
+        # twod_annos (list): A list of :class:`TwoDAnno` objects.
+        two_d_anno_id (int):
+        
+        name (str): Name of the Tag.
+        description (str):
+    '''
+    __tablename__ = "img_tag"
+    idx = Column(Integer, primary_key=True)
+    img_anno_id = Column(Integer, ForeignKey('image_anno.idx'), nullable=False)
+    tag_id = Column(Integer, ForeignKey('tag_directory.idx'), nullable=False)
+    tag = relationship('TagDirectory', uselist=False)
+    
+    def __init__(self, idx=None, img_anno_id=None, tag_id=None):
+        self.idx = idx
+        self.img_anno_id = img_anno_id
+        self.tag_id = tag_id

@@ -507,6 +507,9 @@ class DBMan(object):
         else:
             return None
 
+    def get_all_img_tag(self, img_anno_id):
+        return self.session.query(model.ImageTag)\
+            .filter(model.ImageTag.img_anno_id==img_anno_id).all()
 
     def get_all_two_d_label(self, two_d_anno_id):
         ''' Get all label of a two_d annotation

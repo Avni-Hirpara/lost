@@ -38,7 +38,7 @@ class SIA extends Component {
             image: {
                 id: undefined,
                 data: undefined,
-                imgTag: undefined,
+                imgTags: [],
             },
             layoutOffset: {
                 left: 20,
@@ -220,7 +220,7 @@ class SIA extends Component {
                 this.setState({image: {
                     // ...this.state.image, 
                     id: this.props.annos.image.id, 
-                    imgTag: this.props.annos.image.imgTag,
+                    imgTags: this.props.annos.image.imgTags,
                     data:window.URL.createObjectURL(response)
                 }})
             }
@@ -277,7 +277,7 @@ class SIA extends Component {
                     centerCanvasInContainer={true}
                     onNotification={(messageObj) => this.handleNotification(messageObj)}
                     onKeyDown={ e => this.handleCanvasKeyDown(e)}
-                    imgTag = {this.props.imgTag}
+                    imgTags = {this.props.imgTags}
                 />
                 <ToolBar 
                     ref={this.toolbar} 
@@ -309,7 +309,7 @@ function mapStateToProps(state) {
         imgLabelInput: state.sia.imgLabelInput,
         canvasConfig: state.sia.config,
         isJunk: state.sia.isJunk,
-        imgTag: state.sia.imgTag,
+        imgTags: state.sia.imgTags,
         currentImage: state.sia.annos.image
     })
 }
