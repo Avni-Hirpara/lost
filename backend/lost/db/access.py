@@ -571,6 +571,11 @@ class DBMan(object):
         '''
         return self.session.query(model.User).all()
 
+    def get_available_tags(self):
+        ''' Get all available tags
+        '''
+        return self.session.query(model.TagDirectory).all()
+
     def get_two_d_annotations(self, img_anno_id):
         ''' Get all two_d_annotations of one image annotation
         '''

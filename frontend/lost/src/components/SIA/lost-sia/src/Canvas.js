@@ -147,7 +147,8 @@ class Canvas extends Component{
             isJunk: false,
             imgBarVisible:false,
             annoToolBarVisible: false,
-            possibleLabels: undefined
+            possibleLabels: undefined,
+            imgTags: []
         }
         this.img = React.createRef()
         this.svg = React.createRef()
@@ -159,6 +160,7 @@ class Canvas extends Component{
 
     componentDidMount(){
         this.updatePossibleLabels()
+        this.updatePossibleTags()
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -178,6 +180,12 @@ class Canvas extends Component{
                 })
             }
         }
+        if (prevProps.image.imgTags !== this.props.image.imgTags){
+            this.setState({
+                    imgTags: this.props.image.imgTags
+                })
+            }
+        
         if (this.state.imageData !== this.props.image.data){
             this.setState({imageData: this.props.image.data})
         }
@@ -206,6 +214,7 @@ class Canvas extends Component{
             if (prevState.imgLoadCount !== this.state.imgLoadCount){
                 this.updateCanvasView(this.props.annos.annotations)
                 this.setImageLabels(this.props.annos.image.labelIds)
+                this.setImageTags(this.props.image.imgTags)
                 this.setState({
                     performedImageInit:true
                 })
@@ -531,6 +540,17 @@ class Canvas extends Component{
         )
     }
 
+    handleImgTagUpdate(tag){
+        this.setState({
+            imgTags: tag,
+            imgTagChanged: true,
+        })
+        this.pushHist(this.state.imageData,
+            canvasActions.IMG_TAG_UPDATE,
+            tag
+        )
+    }
+
     handleCanvasClick(e){
         if (this.props.imgBarVisible){
             this.setState({imgBarVisible:true})
@@ -572,6 +592,14 @@ class Canvas extends Component{
         }
         this.setState({
             possibleLabels: [...lbls]
+        })
+    }
+
+    updatePossibleTags(){
+        if(!this.props.imgTags) return
+        if(this.props.imgTags.length <=0) return
+        this.setState({
+            imgTags: this.props.imgTags
         })
     }
 
@@ -753,7 +781,7 @@ class Canvas extends Component{
             annotations: backendFormat,
             isJunk: this.state.isJunk,
             labelValue: this.state.labelValue,
-            imgTag: this.props.image.imgTag
+            imgTag: this.state.imgTag
         }
         return finalData
     }
@@ -1048,6 +1076,14 @@ class Canvas extends Component{
             })
         }
     }
+    setImageTags(tags){
+        if (tags !== this.state.imgTags){
+            this.setState({
+                imgTags: tags
+            })
+        }
+    }
+    
 
     updateCanvasView(annotations){
         

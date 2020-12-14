@@ -14,6 +14,7 @@ do
 done
 # python3 import_pipe_project.py '../pyapi/examples/pipes/ocr_doc_anno'
 # python3 import_label_tree.py '../pyapi/examples/label_trees/pancard_label_tree.csv'
+python3 import_tag_directory.py '../pyapi/examples/tag_directory/image_quality_tag.csv'
 
 # cp -r ../pyapi/examples/images/* $LOST_HOME/data/media
 fi

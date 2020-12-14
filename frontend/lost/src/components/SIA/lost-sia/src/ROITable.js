@@ -74,7 +74,7 @@ class ROITable extends Component{
   };
 
   render(){
-    console.log("Available annos", this.props.annos);
+    // console.log("Available annos", this.props.annos);
     const columns = [{
       Header: 'Label Name',
       accessor: 'id',

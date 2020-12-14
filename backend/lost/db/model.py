@@ -1596,3 +1596,41 @@ class Worker(Base):
         self.register_timestamp = register_timestamp
         self.resources = resources
         self.in_progress = in_progress
+
+class TagDirectory(Base):
+    '''A TagDirectory
+
+    Attributes:
+        idx (int): ID in database.
+        name (str): Name of the Tag.
+        description (str):
+    '''
+    __tablename__ = "tag_directory"
+    idx = Column(Integer, primary_key=True)
+    name = Column(String(100))
+    description = Column(Text)
+    
+    def __init__(self, idx=None, name=None, description=None):
+        self.idx = idx
+        self.name = name
+        self.description = description
+
+    def to_dict(self):
+        '''Transform this object to a dict.
+
+        Returns:
+            dict:
+        '''
+        return {
+            'idx': self.idx,
+            'name': self.name,
+            'timestamp': self.timestamp,
+        }
+
+    def to_df(self):
+        '''Transform this TagDirectory to a pandas DataFrame.
+
+        Returns:
+            pd.DataFrame:
+        '''
+        return pd.DataFrame(self.to_dict(), index=[0])

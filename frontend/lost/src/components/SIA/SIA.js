@@ -22,7 +22,7 @@ import { toSia } from './lost-sia/src/utils/transform'
 
 const { 
     siaLayoutUpdate, getSiaAnnos,
-    getSiaLabels, getSiaConfig, siaSetSVG, getSiaImage, 
+    getSiaLabels, getSiaTags, getSiaConfig, siaSetSVG, getSiaImage, 
     siaUpdateAnnos, siaSendFinishToBackend,
     selectAnnotation, siaShowImgLabelInput, siaImgIsJunk, getWorkingOnAnnoTask,
     siaGetNextImage, siaGetPrevImage
@@ -60,6 +60,7 @@ class SIA extends Component {
         window.addEventListener("resize", this.props.siaLayoutUpdate);
         this.props.getSiaAnnos(-1)
         this.props.getSiaLabels()
+        this.props.getSiaTags()
         this.props.getSiaConfig()
         // console.warn('We are not using real SIA config')
     }
@@ -317,7 +318,7 @@ export default connect(
     mapStateToProps,
     {
         siaLayoutUpdate, getSiaAnnos,
-        getSiaConfig, getSiaLabels, siaSetSVG, getSiaImage,
+        getSiaConfig, getSiaLabels, getSiaTags, siaSetSVG, getSiaImage,
         siaUpdateAnnos, siaSendFinishToBackend,
         selectAnnotation,
         siaShowImgLabelInput,

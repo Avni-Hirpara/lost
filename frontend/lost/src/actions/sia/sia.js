@@ -35,6 +35,13 @@ export const getSiaLabels = () => async dispatch => {
     } catch (e) {console.log(e)}
 }
 
+export const getSiaTags = () => async dispatch => {
+    try {
+        const response = await axios.get(API_URL + '/sia/tag')
+        dispatch({type: TYPES.GET_SIA_TAGS, payload: response.data.tags})
+    } catch (e) {console.log(e)}
+}
+
 export const getSiaConfig = () => async dispatch => {
     try {
         const response = await axios.get(API_URL + '/sia/configuration')
