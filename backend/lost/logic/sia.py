@@ -626,4 +626,5 @@ def reviewoptions(dbm, pe_id, user_id):
     else:
         options['max_iteration'] = pipe_element.iteration
     options['possible_labels'] = get_label_trees(dbm, user_id, pipe_element.anno_task)['labels']
+    options['available_tags'] = get_available_tags(dbm)
     return options

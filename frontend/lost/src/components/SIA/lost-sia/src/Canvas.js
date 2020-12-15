@@ -148,7 +148,8 @@ class Canvas extends Component{
             imgBarVisible:false,
             annoToolBarVisible: false,
             possibleLabels: undefined,
-            imgTags: []
+            availableTags:undefined,
+            imgTag: []
         }
         this.img = React.createRef()
         this.svg = React.createRef()
@@ -180,9 +181,9 @@ class Canvas extends Component{
                 })
             }
         }
-        if (prevProps.image.imgTags !== this.props.image.imgTags){
+        if (prevProps.image.imgTag !== this.props.image.imgTag){
             this.setState({
-                    imgTags: this.props.image.imgTags
+                    imgTag: this.props.image.imgTag
                 })
             }
         
@@ -214,7 +215,7 @@ class Canvas extends Component{
             if (prevState.imgLoadCount !== this.state.imgLoadCount){
                 this.updateCanvasView(this.props.annos.annotations)
                 this.setImageLabels(this.props.annos.image.labelIds)
-                this.setImageTags(this.props.image.imgTags)
+                this.setImageTags(this.props.image.imgTag)
                 this.setState({
                     performedImageInit:true
                 })
@@ -540,16 +541,6 @@ class Canvas extends Component{
         )
     }
 
-    handleImgTagUpdate(tag){
-        this.setState({
-            imgTags: tag,
-            imgTagChanged: true,
-        })
-        this.pushHist(this.state.imageData,
-            canvasActions.IMG_TAG_UPDATE,
-            tag
-        )
-    }
 
     handleCanvasClick(e){
         if (this.props.imgBarVisible){
@@ -596,10 +587,10 @@ class Canvas extends Component{
     }
 
     updatePossibleTags(){
-        if(!this.props.imgTags) return
-        if(this.props.imgTags.length <=0) return
+        if(!this.props.availableTags) return
+        if(this.props.availableTags.length <=0) return
         this.setState({
-            imgTags: this.props.imgTags
+            availableTags: this.props.availableTags
         })
     }
 
@@ -1076,10 +1067,10 @@ class Canvas extends Component{
             })
         }
     }
-    setImageTags(tags){
-        if (tags !== this.state.imgTags){
+    setImageTags(tag){
+        if (tag !== this.state.imgTag){
             this.setState({
-                imgTags: tags
+                imgTag: tag
             })
         }
     }
@@ -1226,18 +1217,21 @@ class Canvas extends Component{
       />
     }
 
-    setTag(tag){
-        if (tag.target.innerText !== this.props.image.imgTag){
+    setTag(e, tag){
+        if (tag !== this.props.image.imgTag){
             this.setState({
-                imgTag: tag.target.innerText
+                imgTag: tag
             })
-            this.props.image.imgTag = tag.target.innerText
+            this.props.image.imgTag = tag
         }
+
+        
     }
     renderTagTable(){
         return <TagDropDown
             imageTag = {this.props.image.imgTag}
-            selectTag={tag=>this.setTag(tag)}
+            selectTag={(e, data)=>this.setTag(e, data)}
+            availableTags={this.props.availableTags}
         />
     }
     render(){

@@ -16,6 +16,7 @@ const INITIAL_STATE = {
     selectedTool: undefined,
     showLabelInput: false,
     possibleLabels: [],
+    availableTags: [],
     getNextImage: undefined,
     getPrevImage: undefined,
     fullscreenMode: false,
@@ -83,6 +84,11 @@ export default function (state = INITIAL_STATE, action) {
             return {
                 ...state,
                 possibleLabels: [...action.payload]
+            }
+        case TYPES.GET_SIA_TAGS:
+            return {
+                ...state,
+                availableTags: [...action.payload]
             }
         case TYPES.SIA_KEY_DOWN:
             return {

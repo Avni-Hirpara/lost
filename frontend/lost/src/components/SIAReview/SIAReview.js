@@ -324,6 +324,7 @@ class SIAReview extends Component {
                     }
                 }}
                 possibleLabels={this.props.filterOptions.possible_labels}
+                availableTags={this.props.filterOptions.available_tags}
                 onSVGUpdate={svg => this.handleSetSVG(svg)}
                 // onAnnoSelect={anno => this.props.selectAnnotation(anno)}
                 layoutOffset={this.state.layoutOffset}

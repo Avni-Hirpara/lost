@@ -1,7 +1,6 @@
 import React, {useState, Component} from 'react'
 import Table from 'pipelineGlobalComponents/modals/Table'
-import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-
+import { Dropdown} from 'semantic-ui-react'
 
 class TagDropDown extends Component{
 
@@ -10,7 +9,29 @@ class TagDropDown extends Component{
     this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false,
+      availableTags: undefined
     };
+  }
+
+  componentWillMount(){
+    this.updatePossibleTags()
+  }
+  componentDidUpdate(prevProps, prevState){
+    
+    if (prevProps.availableTags !== this.props.availableTags){
+        this.updatePossibleTags()
+    }
+  }
+  updatePossibleTags(){
+    let availableTags = []
+    if (this.props.availableTags.length > 0){
+      availableTags = this.props.availableTags.map(e => {
+            return {
+                key: e.tag, value: e.tag, text: e.tag
+            }
+        })
+    }
+    this.setState({availableTags})
   }
 
   toggle(el) {
@@ -20,24 +41,22 @@ class TagDropDown extends Component{
   }
 
   dropDown(){
-    const options = ['low', 'medium', 'high']
-
     return (
-      <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
-        <DropdownToggle caret>
-            
-          {this.props.imageTag?this.props.imageTag:'Select Item...'}
-        </DropdownToggle>
-        <DropdownMenu>
-          {options.map((el)=>{
-            return(
-              <DropdownItem onClick={this.props.selectTag} key={el}> {el}</DropdownItem>
-            )
-          })}
-        </DropdownMenu>
-      </Dropdown>
-    );
-  }
+
+       <Dropdown
+                        search
+                        selection
+                        closeOnChange
+                        icon="search"
+                        options={this.state.availableTags}
+                        placeholder='Enter tag'
+                        tabIndex={0}
+                        value={this.props.imageTag}
+                        onChange={(e, item) => this.props.selectTag(e, item.value)}
+
+                    />
+                    )
+    }
 
   render() {
     return (
@@ -48,7 +67,7 @@ class TagDropDown extends Component{
         data= {
           [
             {
-              key: 'Select Image Quality',
+              key: 'Select Tag:',
               value: this.dropDown()
 
             }

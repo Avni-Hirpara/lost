@@ -269,6 +269,7 @@ class SIA extends Component {
                     selectedTool={this.props.selectedTool}
                     canvasConfig={this.props.canvasConfig}
                     possibleLabels={this.props.possibleLabels}
+                    availableTags={this.props.availableTags}
                     onSVGUpdate={svg => this.props.siaSetSVG(svg)}
                     onAnnoSelect={anno => this.props.selectAnnotation(anno)}
                     layoutOffset={this.state.layoutOffset}
@@ -306,6 +307,7 @@ function mapStateToProps(state) {
         requestAnnoUpdate: state.sia.requestAnnoUpdate,
         taskFinished: state.sia.taskFinished,
         possibleLabels: state.sia.possibleLabels,
+        availableTags: state.sia.availableTags,
         imgLabelInput: state.sia.imgLabelInput,
         canvasConfig: state.sia.config,
         isJunk: state.sia.isJunk,
