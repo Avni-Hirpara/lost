@@ -6,7 +6,6 @@ class TagDropDown extends Component{
 
   constructor(props){
     super(props)
-    this.toggle = this.toggle.bind(this);
     this.state = {
       dropdownOpen: false,
       availableTags: undefined
@@ -34,12 +33,11 @@ class TagDropDown extends Component{
     this.setState({availableTags})
   }
 
-  toggle(el) {
-    this.setState(prevState => ({
-      dropdownOpen: !prevState.dropdownOpen
-    }));
+  handleAddition = (e, { value }) => {
+    this.setState((prevState) => ({
+      availableTags: [{ text: value, value }, ...prevState.availableTags],
+    }))
   }
-
   dropDown(){
     return (
 
@@ -50,7 +48,10 @@ class TagDropDown extends Component{
                         icon="search"
                         options={this.state.availableTags}
                         placeholder='Enter tag'
-                        tabIndex={0}
+                        fluid
+                        additionLabel='Custom tag: '
+                        allowAdditions
+                        onAddItem={this.handleAddition}
                         value={this.props.imageTag}
                         onChange={(e, item) => this.props.selectTag(e, item.value)}
 
